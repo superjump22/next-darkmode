@@ -1,6 +1,6 @@
-# next-easy-darkmode
-
 <div align="center">
+
+# next-easy-darkmode
 
 [![npm version](https://img.shields.io/npm/v/next-easy-darkmode.svg)](https://www.npmjs.com/package/next-easy-darkmode)
 [![npm downloads](https://img.shields.io/npm/dm/next-easy-darkmode.svg)](https://www.npmjs.com/package/next-easy-darkmode)

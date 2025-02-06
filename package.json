@@ -1,5 +1,5 @@
 {
-  "name": "next-darkmode",
+  "name": "next-easy-darkmode",
   "version": "0.0.1",
   "description": "A simple but powerful dark mode solution for Next.js built on next-themes and View Transitions API, providing smooth theme transitions with no flash of unstyled content",
   "author": {
@@ -7,13 +7,13 @@
     "url": "https://github.com/superjump22"
   },
   "license": "MIT",
-  "homepage": "https://github.com/superjump22/next-darkmode#readme",
+  "homepage": "https://github.com/superjump22/next-easy-darkmode#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/superjump22/next-darkmode.git"
+    "url": "https://github.com/superjump22/next-easy-darkmode.git"
   },
   "bugs": {
-    "url": "https://github.com/superjump22/next-darkmode/issues"
+    "url": "https://github.com/superjump22/next-easy-darkmode/issues"
   },
   "keywords": [
     "next.js",

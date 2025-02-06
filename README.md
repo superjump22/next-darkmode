@@ -1,13 +1,13 @@
-# next-darkmode
+# next-easy-darkmode
 
 <div align="center">
 
-[![npm version](https://img.shields.io/npm/v/next-darkmode.svg)](https://www.npmjs.com/package/next-darkmode)
-[![npm downloads](https://img.shields.io/npm/dm/next-darkmode.svg)](https://www.npmjs.com/package/next-darkmode)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/next-darkmode)](https://bundlephobia.com/package/next-darkmode)
-[![License](https://img.shields.io/npm/l/next-darkmode.svg)](https://github.com/superjump22/next-darkmode/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/next-easy-darkmode.svg)](https://www.npmjs.com/package/next-easy-darkmode)
+[![npm downloads](https://img.shields.io/npm/dm/next-easy-darkmode.svg)](https://www.npmjs.com/package/next-easy-darkmode)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/next-easy-darkmode)](https://bundlephobia.com/package/next-easy-darkmode)
+[![License](https://img.shields.io/npm/l/next-easy-darkmode.svg)](https://github.com/superjump22/next-easy-darkmode/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/superjump22/next-darkmode/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/superjump22/next-easy-darkmode/pulls)
 
 A simple but powerful dark mode solution for Next.js with smooth theme transitions
 
@@ -34,13 +34,13 @@ A simple but powerful dark mode solution for Next.js with smooth theme transitio
 ## 📦 Installation
 
 ```bash
-npm install next-themes next-darkmode
+npm install next-themes next-easy-darkmode
 # or
-yarn add next-themes next-darkmode
+yarn add next-themes next-easy-darkmode
 # or
-pnpm add next-themes next-darkmode
+pnpm add next-themes next-easy-darkmode
 # or
-bun add next-themes next-darkmode
+bun add next-themes next-easy-darkmode
 ```
 
 ## 🚀 Quick Start
@@ -92,7 +92,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
 3. Use the hook in your components:
 
 ```tsx
-import { useDarkMode } from 'next-darkmode'
+import { useDarkMode } from 'next-easy-darkmode'
 
 const MyComponent = () => {
   const { isDarkMode, toggle } = useDarkMode()

@@ -1,0 +1,76 @@
+{
+  "name": "next-darkmode",
+  "version": "0.0.1",
+  "description": "A simple but powerful dark mode solution for Next.js built on next-themes and View Transitions API, providing smooth theme transitions with no flash of unstyled content",
+  "author": {
+    "name": "Super Jump",
+    "url": "https://github.com/superjump22"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/superjump22/next-darkmode#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superjump22/next-darkmode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/superjump22/next-darkmode/issues"
+  },
+  "keywords": [
+    "next.js",
+    "dark-mode",
+    "theme",
+    "react",
+    "typescript",
+    "animation",
+    "view-transition"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepublish": "pnpm build",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "peerDependencies": {
+    "next-themes": "^0.4.4",
+    "react": "^16.8 || ^17 || ^18 || ^19",
+    "react-dom": "^16.8 || ^17 || ^18 || ^19"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.1.1",
+    "@eslint-react/eslint-plugin": "^1.26.2",
+    "@eslint/eslintrc": "^3.2.0",
+    "@types/node": "^22.13.1",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "eslint": "^9.19.0",
+    "eslint-plugin-format": "^1.0.1",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.18",
+    "lint-staged": "^15.4.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "simple-git-hooks": "^2.11.1",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
+  }
+}

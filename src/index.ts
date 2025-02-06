@@ -1,4 +1,4 @@
-import type { CircularRevealConfig, DarkModeConfig, DarkModeReturn, DarkModeTheme } from './types'
+import type { CircularRevealConfig, DarkModeConfig, DarkModeReturn, DarkModeTheme, TransitionType } from './types'
 import { useTheme } from 'next-themes'
 import { flushSync } from 'react-dom'
 
@@ -62,32 +62,43 @@ const removeClipPathStyles = () => {
  *
  * @example
  * ```tsx
+ * // Basic usage with fade transition (default)
+ * const { toggle } = useDarkMode()
+ *
+ * // No transition
+ * const { toggle } = useDarkMode({
+ *   transition: { type: 'none' }
+ * })
+ *
  * // Circular reveal from element center
  * const MyComponent = () => {
- *   const buttonRef = useRef<HTMLButtonElement>(null);
- *   const { isDarkMode, toggle } = useDarkMode({
+ *   const buttonRef = useRef<HTMLButtonElement>(null)
+ *   const { toggle } = useDarkMode({
  *     transition: {
  *       type: 'circular-reveal',
  *       center: { ref: buttonRef }
  *     },
  *     duration: 300
- *   });
+ *   })
  *
  *   return (
  *     <button ref={buttonRef} onClick={toggle}>
- *       {isDarkMode ? '🌞' : '🌙'}
+ *       toggle
  *     </button>
- *   );
- * };
+ *   )
+ * }
  *
- * // Circular reveal from specific coordinates
- * const { isDarkMode, toggle } = useDarkMode({
+ * // Custom transition with clip-path
+ * const { toggle } = useDarkMode({
  *   transition: {
- *     type: 'circular-reveal',
- *     center: { x: 100, y: 100 }
+ *     type: 'custom',
+ *     clipPath: {
+ *       from: 'inset(0 0 100% 0)',
+ *       to: 'inset(0)'
+ *     }
  *   },
  *   duration: 300
- * });
+ * })
  * ```
  */
 export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
@@ -118,12 +129,12 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
 
     // Handle different transition types
     switch (transition.type) {
-      case 'none': {
-        setTheme(newTheme)
-        return
-      }
-
+      case 'none':
       case 'fade': {
+        if (transition.type === 'none') {
+          setTheme(newTheme)
+          return
+        }
         removeClipPathStyles()
         document.startViewTransition(() => {
           flushSync(() => setTheme(newTheme))
@@ -189,7 +200,6 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
   }
 
   return {
-    isDarkMode,
     toggle: () => applyTheme(isDarkMode ? 'light' : 'dark'),
     enable: () => applyTheme('dark'),
     disable: () => applyTheme('light'),
@@ -197,4 +207,4 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
   }
 }
 
-export type { DarkModeConfig, DarkModeReturn, DarkModeTheme }
+export type { CircularRevealConfig, DarkModeConfig, DarkModeReturn, DarkModeTheme, TransitionType }

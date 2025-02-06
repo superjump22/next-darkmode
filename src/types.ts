@@ -10,8 +10,6 @@ export type DarkModeTheme = 'dark' | 'light' | 'system'
  * Interface defining the hook's return value and available operations
  */
 export interface DarkModeReturn {
-  /** Indicates whether dark mode is currently active */
-  isDarkMode: boolean
   /** Toggles between light and dark mode */
   toggle: () => void
   /** Activates dark mode */
@@ -33,8 +31,7 @@ export type CircularRevealConfig =
  * Transition types for theme switching
  */
 export type TransitionType =
-  | { type: 'none' }
-  | { type: 'fade' }
+  | { type: 'none' | 'fade' }
   | { type: 'circular-reveal', center: CircularRevealConfig }
   | { type: 'custom', clipPath: { from: string, to: string } }
 

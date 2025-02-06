@@ -1,6 +1,6 @@
 {
   "name": "next-easy-darkmode",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple but powerful dark mode solution for Next.js built on next-themes and View Transitions API, providing smooth theme transitions with no flash of unstyled content",
   "author": {
     "name": "Super Jump",

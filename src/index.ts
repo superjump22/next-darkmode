@@ -23,6 +23,29 @@ const getCircularRevealCenter = (config: CircularRevealConfig): { x: number, y: 
   }
 }
 
+const CLIP_PATH_STYLE_ID = '__next-dark-mode-clip-path-styles__'
+
+const addClipPathStyles = () => {
+  let style = document.getElementById(CLIP_PATH_STYLE_ID) as HTMLStyleElement | null
+  if (!style) {
+    style = document.createElement('style')
+    style.id = CLIP_PATH_STYLE_ID
+    style.textContent = `
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation: none;
+        mix-blend-mode: normal;
+      }
+    `
+    document.head.appendChild(style)
+  }
+}
+
+const removeClipPathStyles = () => {
+  const style = document.getElementById(CLIP_PATH_STYLE_ID) as HTMLStyleElement | null
+  style?.parentNode?.removeChild(style)
+}
+
 /**
  * A custom React hook for managing dark mode with smooth transitions.
  *
@@ -93,8 +116,6 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
       return
     }
 
-    const CIRCULAR_REVEAL_STYLE_ID = '__next-dark-mode-circular-reveal-styles__'
-
     // Handle different transition types
     switch (transition.type) {
       case 'none': {
@@ -103,8 +124,7 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
       }
 
       case 'fade': {
-        const style = document.getElementById(CIRCULAR_REVEAL_STYLE_ID) as HTMLStyleElement | null
-        style?.parentNode?.removeChild(style)
+        removeClipPathStyles()
         document.startViewTransition(() => {
           flushSync(() => setTheme(newTheme))
         })
@@ -112,20 +132,7 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
       }
 
       case 'circular-reveal': {
-        // Create or retrieve the style element for view transitions
-        let style = document.getElementById(CIRCULAR_REVEAL_STYLE_ID) as HTMLStyleElement | null
-        if (!style) {
-          style = document.createElement('style')
-          style.id = CIRCULAR_REVEAL_STYLE_ID
-          style.textContent = `
-            ::view-transition-old(root),
-            ::view-transition-new(root) {
-              animation: none;
-              mix-blend-mode: normal;
-            }
-          `
-          document.head.appendChild(style)
-        }
+        addClipPathStyles()
 
         // Start view transition
         await document.startViewTransition(() => {
@@ -159,8 +166,7 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
       }
 
       case 'custom': {
-        const style = document.getElementById(CIRCULAR_REVEAL_STYLE_ID) as HTMLStyleElement | null
-        style?.parentNode?.removeChild(style)
+        addClipPathStyles()
 
         // Start view transition
         await document.startViewTransition(() => {

@@ -1,11 +1,11 @@
-import type { CircularRevealConfig, DarkModeConfig, DarkModeReturn, DarkModeTheme, TransitionType } from './types'
+import type { CircularRevealCenter, DarkModeConfig, DarkModeReturn, DarkModeTheme, TransitionType } from './types'
 import { useTheme } from 'next-themes'
 import { flushSync } from 'react-dom'
 
 /**
  * Gets the center coordinates for circular reveal transition
  */
-const getCircularRevealCenter = (config: CircularRevealConfig): { x: number, y: number } => {
+const getCircularRevealCenter = (config: CircularRevealCenter): { x: number, y: number } => {
   if ('ref' in config && config.ref.current) {
     const rect = config.ref.current.getBoundingClientRect()
     return {
@@ -23,13 +23,13 @@ const getCircularRevealCenter = (config: CircularRevealConfig): { x: number, y: 
   }
 }
 
-const CLIP_PATH_STYLE_ID = '__next-dark-mode-clip-path-styles__'
+const ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES = '__next-easy-dark-mode-disable-view-transition-default-styles__'
 
-const addClipPathStyles = () => {
-  let style = document.getElementById(CLIP_PATH_STYLE_ID) as HTMLStyleElement | null
+const disableDefaultStyles = () => {
+  let style = document.getElementById(ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES) as HTMLStyleElement | null
   if (!style) {
     style = document.createElement('style')
-    style.id = CLIP_PATH_STYLE_ID
+    style.id = ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES
     style.textContent = `
       ::view-transition-old(root),
       ::view-transition-new(root) {
@@ -41,8 +41,8 @@ const addClipPathStyles = () => {
   }
 }
 
-const removeClipPathStyles = () => {
-  const style = document.getElementById(CLIP_PATH_STYLE_ID) as HTMLStyleElement | null
+const resetDefaultStyles = () => {
+  const style = document.getElementById(ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES) as HTMLStyleElement | null
   style?.parentNode?.removeChild(style)
 }
 
@@ -135,7 +135,7 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
           setTheme(newTheme)
           return
         }
-        removeClipPathStyles()
+        resetDefaultStyles()
         document.startViewTransition(() => {
           flushSync(() => setTheme(newTheme))
         })
@@ -143,7 +143,7 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
       }
 
       case 'circular-reveal': {
-        addClipPathStyles()
+        disableDefaultStyles()
 
         // Start view transition
         await document.startViewTransition(() => {
@@ -177,7 +177,7 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
       }
 
       case 'custom': {
-        addClipPathStyles()
+        disableDefaultStyles()
 
         // Start view transition
         await document.startViewTransition(() => {
@@ -207,4 +207,4 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
   }
 }
 
-export type { CircularRevealConfig, DarkModeConfig, DarkModeReturn, DarkModeTheme, TransitionType }
+export type { CircularRevealCenter as CircularRevealConfig, DarkModeConfig, DarkModeReturn, DarkModeTheme, TransitionType }

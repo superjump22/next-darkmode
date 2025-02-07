@@ -23,7 +23,7 @@ export interface DarkModeReturn {
 /**
  * Configuration for circular reveal transition
  */
-export type CircularRevealConfig =
+export type CircularRevealCenter =
   | { ref: React.RefObject<HTMLElement | null> }
   | { x: number, y: number }
 
@@ -32,7 +32,7 @@ export type CircularRevealConfig =
  */
 export type TransitionType =
   | { type: 'none' | 'fade' }
-  | { type: 'circular-reveal', center: CircularRevealConfig }
+  | { type: 'circular-reveal', center: CircularRevealCenter }
   | { type: 'custom', clipPath: { from: string, to: string } }
 
 /**

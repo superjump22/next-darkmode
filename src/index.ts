@@ -31,10 +31,15 @@ const disableDefaultStyles = () => {
     style = document.createElement('style')
     style.id = ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES
     style.textContent = `
+      ::view-transition-image-pair(root) {
+        isolation: auto;
+      }
+
       ::view-transition-old(root),
       ::view-transition-new(root) {
         animation: none;
         mix-blend-mode: normal;
+        display: block;
       }
     `
     document.head.appendChild(style)

@@ -246,7 +246,7 @@ const handleCustomTransition = async (
  * - Fallback for unsupported browsers
  */
 export function useDarkMode(transition: DarkModeTransition = { type: 'default' }): DarkModeReturn {
-  const { theme, resolvedTheme, setTheme } = useTheme()
+  const { theme, resolvedTheme, setTheme, systemTheme } = useTheme()
   const isDarkMode = resolvedTheme === 'dark'
 
   const applyTheme = async (newTheme: DarkModeTheme) => {
@@ -255,6 +255,20 @@ export function useDarkMode(transition: DarkModeTransition = { type: 'default' }
     }
 
     if (typeof window === 'undefined' || !document.startViewTransition) {
+      setTheme(newTheme)
+      return
+    }
+
+    if (theme === 'system' && resolvedTheme === newTheme) {
+      // `newTheme` won't be 'system' here
+      // If `theme` is 'system' and current resolved theme is the same as the new theme, should not trigger a view transition
+      setTheme(newTheme)
+      return
+    }
+
+    if (newTheme === 'system' && resolvedTheme === systemTheme) {
+      // `theme` won't be 'system' here
+      // If `newTheme` is 'system' and current resolved theme is the same as the system preference theme, should not trigger a view transition
       setTheme(newTheme)
       return
     }

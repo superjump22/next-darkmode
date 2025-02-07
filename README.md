@@ -18,16 +18,15 @@ A simple but powerful dark mode solution for Next.js with smooth theme transitio
 
 ## Features
 
-- Support for dark, light, and system theme modes
-- Multiple theme transition effects
+- 🌗 Support for dark, light, and system theme modes
+- 🎭 Multiple transition effects
   - Fade transition (default)
   - Circular reveal from element or coordinates
-  - Custom clip-path animations
-- Based on [View Transitions API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API)
-- Server-side rendering (SSR) compatible
-- Prevents flash of unstyled content (FOUC)
-
-> 💡 This package extends [`next-themes`](https://github.com/pacocoursey/next-themes) with enhanced transition capabilities. For browsers that don't support the [View Transitions API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API), it gracefully falls back to instant theme switching.
+  - Custom animations with Web Animations API
+- 🚀 Based on [next-themes](https://github.com/pacocoursey/next-themes) and [View Transitions API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API)
+- 🖥️ Server-side rendering (SSR) compatible
+- ⚡ Prevents flash of unstyled content (FOUC)
+- 🔄 Graceful fallback for unsupported browsers
 
 ## Installation
 
@@ -41,7 +40,7 @@ pnpm add next-themes next-easy-darkmode
 bun add next-themes next-easy-darkmode
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 1. Create a theme provider:
 
@@ -68,21 +67,19 @@ import { ThemeProvider } from "@/components/theme-provider"
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <>
-      <html lang="en" suppressHydrationWarning>
-        <head />
-        <body>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </body>
-      </html>
-    </>
+    <html lang="en" suppressHydrationWarning>
+      <head />
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
   )
 }
 ```
@@ -97,7 +94,7 @@ const MyComponent = () => {
 
   return (
     <button onClick={toggle}>
-      toggle
+      Toggle
     </button>
   )
 }
@@ -105,154 +102,83 @@ const MyComponent = () => {
 
 ## Transition Options
 
-The hook supports several transition types for theme switching:
+### 1. None
 
-### 1. Default (Fade)
-
-<details>
-<summary>Simple fade transition between themes</summary>
+Instant theme switching without any transition effect:
 
 ```tsx
-// Default fade transition
+const { toggle } = useDarkMode({
+  type: 'none'
+})
+```
+
+### 2. Default
+
+Simple fade transition between light and dark mode:
+
+```tsx
+// These are equivalent
 const { toggle } = useDarkMode()
-
-// Customized fade transition
-const { toggle } = useDarkMode({
-  transition: { type: 'fade' },
-  duration: 300,
-  easing: 'ease-out'
-})
+const { toggle } = useDarkMode({ type: 'default' })
 ```
-</details>
-
-### 2. No Transition
-
-<details>
-<summary>Instant theme switching without effects</summary>
-
-```tsx
-const { toggle } = useDarkMode({
-  transition: { type: 'none' }
-})
-```
-</details>
 
 ### 3. Circular Reveal
 
 Circular reveal transition that expands from a point:
 
-<details>
-<summary>View examples</summary>
-
 ```tsx
-// Using an element reference
+// Reveal from button center
 const MyComponent = () => {
   const buttonRef = useRef<HTMLButtonElement>(null)
   const { toggle } = useDarkMode({
-    transition: { 
-      type: 'circular-reveal', 
-      center: { ref: buttonRef }
-    },
-    duration: 300
+    type: 'circular-reveal',
+    center: { ref: buttonRef },
+    duration: 300,
+    easing: 'ease-out'
   })
 
   return (
     <button ref={buttonRef} onClick={toggle}>
-      toggle
+      Toggle
     </button>
   )
 }
 
-// Using specific coordinates
+// Reveal from specific coordinates
 const { toggle } = useDarkMode({
-  transition: { 
-    type: 'circular-reveal', 
-    center: { x: 100, y: 100 }
-  },
-  duration: 300
+  type: 'circular-reveal',
+  center: { x: 100, y: 100 },
+  duration: 500,
+  easing: 'ease-in-out'
 })
 ```
-</details>
 
-### 4. Custom Transition
+### 4. Custom Animations
 
-<details>
-<summary>Creative transition effects using clip-path</summary>
+Full control over transitions using Web Animations API:
 
 ```tsx
 // Slide from top
 const { toggle } = useDarkMode({
-  transition: {
-    type: 'custom',
-    clipPath: {
-      from: 'inset(0 0 100% 0)',
-      to: 'inset(0)'
+  type: 'custom',
+  new: {
+    keyframes: [
+      { transform: 'translateY(-100%)' },
+      { transform: 'translateY(0)' }
+    ],
+    options: {
+      duration: 300,
+      easing: 'ease-out'
     }
-  },
-  duration: 300
-})
-
-// Diamond expand
-const { toggle } = useDarkMode({
-  transition: {
-    type: 'custom',
-    clipPath: {
-      from: 'polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)',
-      to: 'polygon(-50% 50%, 50% -50%, 150% 50%, 50% 150%)'
-    }
-  },
-  duration: 400
+  }
 })
 ```
-</details>
 
-## API
-
-<details>
-<summary>View complete API documentation</summary>
-
-### useDarkMode
-
-```typescript
-function useDarkMode(config?: DarkModeConfig): DarkModeReturn
-
-interface DarkModeConfig {
-  /** Optional transition configuration. Default is { type: 'fade' } */
-  transition?: TransitionType
-  /** Optional duration for the transition in milliseconds. Default is 500 */
-  duration?: number
-  /** Optional easing function for the transition. Default is 'ease-in-out' */
-  easing?: string
-}
-
-type TransitionType =
-  | { type: 'none' | 'fade' }
-  | { type: 'circular-reveal'; center: CircularRevealConfig }
-  | { type: 'custom'; clipPath: { from: string; to: string } }
-
-type CircularRevealConfig =
-  | { ref: React.RefObject<HTMLElement | null> }
-  | { x: number; y: number }
-
-interface DarkModeReturn {
-  /** Toggles between light and dark mode */
-  toggle: () => void
-  /** Activates dark mode */
-  enable: () => void
-  /** Activates light mode */
-  disable: () => void
-  /** Sets theme to follow system preferences */
-  system: () => void
-}
-```
-</details>
+See [More Examples](https://github.com/superjump22/next-easy-darkmode-example) or [Live Demo](https://next-easy-darkmode-example.vercel.app).
 
 ## Browser Support
 
 The smooth transitions require the [View Transitions API](https://caniuse.com/view-transitions). For browsers that don't support it, the theme will change instantly without transition effects.
-
-<details>
-<summary>View browser compatibility</summary>
 
 | Browser | Version | Global Support |
 |---------|---------|----------------|
@@ -266,8 +192,6 @@ The smooth transitions require the [View Transitions API](https://caniuse.com/vi
 | Samsung Internet | ✅ 23+ | 2.84% |
 
 > Data from [Can I Use](https://caniuse.com/view-transitions) (2025)
-
-</details>
 
 ## Contributing
 

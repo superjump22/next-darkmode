@@ -107,7 +107,7 @@ const MyComponent = () => {
 
 The hook supports several transition types for theme switching:
 
-### 1. Fade (Default)
+### 1. Default (Fade)
 
 <details>
 <summary>Simple fade transition between themes</summary>

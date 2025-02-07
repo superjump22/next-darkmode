@@ -1,11 +1,40 @@
-import type { CircularRevealCenter, DarkModeConfig, DarkModeReturn, DarkModeTheme, TransitionType } from './types'
 import { useTheme } from 'next-themes'
 import { flushSync } from 'react-dom'
 
-/**
- * Gets the center coordinates for circular reveal transition
- */
-const getCircularRevealCenter = (config: CircularRevealCenter): { x: number, y: number } => {
+export type DarkModeTheme = 'dark' | 'light' | 'system'
+
+export interface DarkModeReturn {
+  toggle: () => void
+  enable: () => void
+  disable: () => void
+  system: () => void
+}
+
+type CircularRevealCenter =
+  | { ref: React.RefObject<HTMLElement | null> }
+  | { x: number, y: number }
+
+interface AnimateConfig {
+  keyframes: Keyframe[] | PropertyIndexedKeyframes | null
+  options?: number | KeyframeAnimationOptions
+}
+
+export type DarkModeTransition =
+  | { type: 'none' | 'default' }
+  | {
+    type: 'circular-reveal'
+    center: CircularRevealCenter
+    duration?: number | CSSNumericValue | string
+    easing?: string
+  }
+  | {
+    type: 'custom'
+    old?: AnimateConfig
+    new?: AnimateConfig
+    css?: string
+  }
+
+const getCircularRevealCenter = (config: CircularRevealCenter) => {
   if ('ref' in config && config.ref.current) {
     const rect = config.ref.current.getBoundingClientRect()
     return {
@@ -16,7 +45,6 @@ const getCircularRevealCenter = (config: CircularRevealCenter): { x: number, y: 
   if ('x' in config && 'y' in config) {
     return { x: config.x, y: config.y }
   }
-  // Fallback to center of viewport
   return {
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
@@ -24,13 +52,27 @@ const getCircularRevealCenter = (config: CircularRevealCenter): { x: number, y: 
 }
 
 const ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES = '__next-easy-dark-mode-disable-view-transition-default-styles__'
+const ID_ADD_VIEW_TRANSITION_CUSTOM_STYLES = '__next-easy-dark-mode-add-view-transition-custom-styles__'
 
-const disableDefaultStyles = () => {
-  let style = document.getElementById(ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES) as HTMLStyleElement | null
+const addDocumentStyles = (id: string, textContent: string) => {
+  let style = document.getElementById(id) as HTMLStyleElement | null
   if (!style) {
     style = document.createElement('style')
-    style.id = ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES
-    style.textContent = `
+    style.id = id
+    style.textContent = textContent
+    document.head.appendChild(style)
+  }
+}
+
+const removeDocumentStyles = (id: string) => {
+  const style = document.getElementById(id) as HTMLStyleElement | null
+  style?.parentNode?.removeChild(style)
+}
+
+const disableDefaultStyles = () => {
+  addDocumentStyles(
+    ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES,
+    `
       ::view-transition-image-pair(root) {
         isolation: auto;
       }
@@ -41,86 +83,18 @@ const disableDefaultStyles = () => {
         mix-blend-mode: normal;
         display: block;
       }
-    `
-    document.head.appendChild(style)
-  }
+    `,
+  )
 }
 
 const resetDefaultStyles = () => {
-  const style = document.getElementById(ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES) as HTMLStyleElement | null
-  style?.parentNode?.removeChild(style)
+  removeDocumentStyles(ID_DISABLE_VIEW_TRANSITION_DEFAULT_STYLES)
 }
 
-/**
- * A custom React hook for managing dark mode with smooth transitions.
- *
- * Features:
- * - Synchronizes with system color scheme preferences
- * - Persists theme choice in local storage
- * - Supports View Transitions API for smooth theme switching
- * - Server-side rendering (SSR) compatible
- * - Prevents flash of unstyled content (FOUC)
- * - Provides multiple transition options for theme switching
- *
- * @param config - Configuration options for the hook
- * @returns An object containing the current dark mode state and control functions
- *
- * @example
- * ```tsx
- * // Basic usage with fade transition (default)
- * const { toggle } = useDarkMode()
- *
- * // No transition
- * const { toggle } = useDarkMode({
- *   transition: { type: 'none' }
- * })
- *
- * // Circular reveal from element center
- * const MyComponent = () => {
- *   const buttonRef = useRef<HTMLButtonElement>(null)
- *   const { toggle } = useDarkMode({
- *     transition: {
- *       type: 'circular-reveal',
- *       center: { ref: buttonRef }
- *     },
- *     duration: 300
- *   })
- *
- *   return (
- *     <button ref={buttonRef} onClick={toggle}>
- *       toggle
- *     </button>
- *   )
- * }
- *
- * // Custom transition with clip-path
- * const { toggle } = useDarkMode({
- *   transition: {
- *     type: 'custom',
- *     clipPath: {
- *       from: 'inset(0 0 100% 0)',
- *       to: 'inset(0)'
- *     }
- *   },
- *   duration: 300
- * })
- * ```
- */
-export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
-  const {
-    transition = { type: 'fade' },
-    duration = 500,
-    easing = 'ease-in-out',
-  } = config
+export function useDarkMode(transition: DarkModeTransition = { type: 'default' }): DarkModeReturn {
   const { theme, resolvedTheme, setTheme } = useTheme()
   const isDarkMode = resolvedTheme === 'dark'
 
-  /**
-   * Applies theme change with a smooth transition when supported.
-   * Falls back to an instant change if the View Transitions API is not available.
-   *
-   * @param newTheme - The target theme to apply ('dark', 'light', or 'system')
-   */
   const applyTheme = async (newTheme: DarkModeTheme) => {
     if (theme === newTheme) {
       return
@@ -135,25 +109,18 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
     // Handle different transition types
     switch (transition.type) {
       case 'none':
-      case 'fade': {
-        if (transition.type === 'none') {
-          setTheme(newTheme)
-          return
-        }
+        setTheme(newTheme)
+        return
+
+      case 'default':
         resetDefaultStyles()
         document.startViewTransition(() => {
           flushSync(() => setTheme(newTheme))
         })
         return
-      }
 
       case 'circular-reveal': {
         disableDefaultStyles()
-
-        // Start view transition
-        await document.startViewTransition(() => {
-          flushSync(() => setTheme(newTheme))
-        }).ready
 
         // Get center coordinates
         const { x: centerX, y: centerY } = getCircularRevealCenter(transition.center)
@@ -163,43 +130,87 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
           Math.max(centerX, window.innerWidth - centerX),
           Math.max(centerY, window.innerHeight - centerY),
         )
+        // Start view transition
+        const viewTransition = document.startViewTransition(() => {
+          flushSync(() => setTheme(newTheme))
+        })
 
-        // Apply the circular reveal transition
-        document.documentElement.animate(
-          {
-            clipPath: [
-              `circle(0px at ${centerX}px ${centerY}px)`,
-              `circle(${maxRadius}px at ${centerX}px ${centerY}px)`,
-            ],
-          },
-          {
-            duration,
-            easing,
-            pseudoElement: '::view-transition-new(root)',
-          },
-        )
+        try {
+          await viewTransition.ready
+          // Apply the circular reveal transition
+          document.documentElement.animate(
+            {
+              clipPath: [
+                `circle(0px at ${centerX}px ${centerY}px)`,
+                `circle(${maxRadius}px at ${centerX}px ${centerY}px)`,
+              ],
+            },
+            {
+              duration: transition.duration || 500,
+              easing: transition.easing || 'ease-in-out',
+              pseudoElement: '::view-transition-new(root)',
+            },
+          )
+        }
+        catch {
+          // Ignore errors during animation
+        }
+
+        try {
+          await viewTransition.finished
+        }
+        finally {
+          resetDefaultStyles()
+        }
         return
       }
 
       case 'custom': {
         disableDefaultStyles()
+        if (transition.css) {
+          addDocumentStyles(ID_ADD_VIEW_TRANSITION_CUSTOM_STYLES, transition.css)
+        }
 
-        // Start view transition
-        await document.startViewTransition(() => {
+        const viewTransition = document.startViewTransition(() => {
           flushSync(() => setTheme(newTheme))
-        }).ready
+        })
 
-        // Apply custom transition
-        document.documentElement.animate(
-          {
-            clipPath: [transition.clipPath.from, transition.clipPath.to],
-          },
-          {
-            duration,
-            easing,
-            pseudoElement: '::view-transition-new(root)',
-          },
-        )
+        try {
+          await viewTransition.ready
+
+          if (transition.old) {
+            const { keyframes, options } = transition.old
+            document.documentElement.animate(
+              keyframes,
+              typeof options === 'number'
+                ? { duration: options, pseudoElement: '::view-transition-new(root)' }
+                : { ...options, pseudoElement: '::view-transition-old(root)' },
+            )
+          }
+
+          if (transition.new) {
+            const { keyframes, options } = transition.new
+            document.documentElement.animate(
+              keyframes,
+              typeof options === 'number'
+                ? { duration: options, pseudoElement: '::view-transition-new(root)' }
+                : { ...options, pseudoElement: '::view-transition-new(root)' },
+            )
+          }
+        }
+        catch {
+          // Ignore errors during animation
+        }
+
+        try {
+          await viewTransition.finished
+        }
+        finally {
+          resetDefaultStyles()
+          if (transition.css) {
+            removeDocumentStyles(ID_ADD_VIEW_TRANSITION_CUSTOM_STYLES)
+          }
+        }
       }
     }
   }
@@ -211,5 +222,3 @@ export function useDarkMode(config: DarkModeConfig = {}): DarkModeReturn {
     system: () => applyTheme('system'),
   }
 }
-
-export type { CircularRevealCenter as CircularRevealConfig, DarkModeConfig, DarkModeReturn, DarkModeTheme, TransitionType }
